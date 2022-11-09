@@ -1,5 +1,10 @@
 Spécifications de l'application:
 
+class Livre : 
+pour chaque fichier dans le dossier, il vérifie si c'est un pdf, epub , txt,
+
+
+il extrait le titre, l'auteur, et la tables des matières 
 
 Conception Objet:
 
