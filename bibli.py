@@ -51,8 +51,8 @@ class Pdf():
     def __repr__(self):
         return f"{self.titre} de {self.auteur}"
     
-    def txt_extract(myFile):
-         with open(myFile,'rb') as f:
+    def txt_extract(self):
+         with open(self.fichier,'rb') as f:
               pdf = PdfFileReader(f)
               page = pdf.getPage(1)
               print(page)
