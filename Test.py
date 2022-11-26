@@ -37,3 +37,7 @@ for doc in documents:
         DocumentsAutres.append(doc)
         
 print(len(DocumentsPDF)+len(DocumentsEpub)+len(DocumentsZip)+len(DocumentsAutres)) #doit afficher 4323
+
+from bibli import Trier
+
+print(Trier(dossier))
