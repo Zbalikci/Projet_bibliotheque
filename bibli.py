@@ -10,7 +10,7 @@ class Trier():
     dans laquelle se trouve tous les fichiers epub du dossier donné en argument.
     """
     def __init__(self,dossier):
-        self.dossier=dossier
+        self.dossier=glob.glob(os.path.join(dossier,"*"))
         self.DocumentsPDF=[]
         self.DocumentsEpub=[]
         self.DocumentsZip=[]
