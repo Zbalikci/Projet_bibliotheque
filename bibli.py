@@ -50,15 +50,16 @@ class Pdf():
     
     def __repr__(self):
         return f"{self.titre} de {self.auteur}"
-    
+
     def txt_extract(self):
-         with open(self.fichier,'rb') as f:
-              pdf = PdfFileReader(f)
-              page = pdf.getPage(1)
-              print(page)
-              print('Type de page:'.format(str(type(page))))
-              text = page.extractText()
-              print(text)
+        with open(self.fichier,'rb') as f:
+            pdf = PdfReader(f)
+            #pdf = PdfFileReader(f) non car dans la nouvelle version du PyPDF2 ils utilisent plutôt le module PdfReader
+            page = pdf.getPage(1)
+            print(page)
+            print('Type de page:'.format(str(type(page))))
+            text = page.extractText()
+            print(text)
 
 class Epub():
     """
@@ -75,7 +76,6 @@ class Epub():
     
     def __repr__(self):
         return f"{self.titre} de {self.auteur}"
-    pass
 
 class Livres():
     """
