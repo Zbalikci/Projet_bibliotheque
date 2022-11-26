@@ -1,8 +1,6 @@
 #!/bin/env python3
-
-from glob import glob
+import glob
 import os
-from os import path
 import sys
 
 class Trier():
@@ -28,7 +26,10 @@ class Trier():
             if nature == '':
                 self.DocumentsAutres.append(doc)
     
-    pass
+    def __str__(self):
+        return f"Il y a {len(self.DocumentsPDF)+len(self.DocumentsEpub)+len(self.DocumentsZip)+len(self.DocumentsAutres)} fichiers dans ce dossier"
+    def __repr__(self):
+        return f"Il y a {len(self.DocumentsPDF)+len(self.DocumentsEpub)+len(self.DocumentsZip)+len(self.DocumentsAutres)} fichiers dans ce dossier"
 
 class Pdf():
     """
