@@ -50,6 +50,15 @@ class Pdf():
     
     def __repr__(self):
         return f"{self.titre} de {self.auteur}"
+    
+    def txt_extract(myFile):
+         with open(myFile,'rb') as f:
+              pdf = PdfFileReader(f)
+              page = pdf.getPage(1)
+              print(page)
+              print('Type de page:'.format(str(type(page))))
+              text = page.extractText()
+              print(text)
 
 class Epub():
     """
