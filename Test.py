@@ -65,10 +65,27 @@ from bibli import Pdf
 livre = Pdf("C:/Users/Zeynep/Downloads/livres_2/gide_immoraliste.pdf")
 print(livre)
 
+#################################### TEST POUR TROUVER LA FONCTION ####################################
+
+import ebooklib
+from ebooklib import epub
+
+book = epub.read_epub("C:/Users/Zeynep/Downloads/livres_2/zola_emile_-_l_assommoir.epub")
+
+items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
+
+print(book.get_metadata('DC', 'creator')[0][0])
+print(book.get_metadata('DC', 'title')[0][0])
+
+
 ####################################       on test le module       ####################################
 
 from bibli import Livres
 
-Files=Trier(dossier).DocumentsPDF
-Books=Livres(Files)
-print(Books)
+Files1=Trier(dossier).DocumentsPDF
+Books1=Livres(Files1)
+print(Books1)
+
+Files2=Trier(dossier).DocumentsEpub
+Books2=Livres(Files2)
+print(Books2)
