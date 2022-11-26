@@ -64,6 +64,8 @@ from bibli import Pdf
 
 livre = Pdf("C:/Users/Zeynep/Downloads/livres_2/gide_immoraliste.pdf")
 print(livre)
+File = "/Users/mariamadiabymbaye/Documents/livres/gide_immoraliste.pdf"
+Pdf.txt_extract(File)
 
 #################################### TEST POUR TROUVER LA FONCTION ####################################
 
