@@ -62,10 +62,20 @@ print (author + "|" + title )
 ####################################       on test le module       ####################################
 from bibli import Pdf
 
-livre = Pdf("C:/Users/Zeynep/Downloads/livres_2/gide_immoraliste.pdf")
+livre = Pdf(myFile)
 print(livre)
-File = "/Users/mariamadiabymbaye/Documents/livres/gide_immoraliste.pdf"
-Pdf.txt_extract(File)
+
+livre.txt_extract()
+
+# si tu prends ton File comme ça :
+#File = "/Users/mariamadiabymbaye/Documents/livres/gide_immoraliste.pdf"
+
+#c'est plus correct d'écrire 
+#livre=Pdf(File)
+#livre..txt_extract()
+
+#Et non:
+#Pdf.txt_extract(File) --> ça ne devrait pas marchait écrit de cette facon
 
 #################################### TEST POUR TROUVER LA FONCTION ####################################
 
