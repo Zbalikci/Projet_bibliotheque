@@ -2,6 +2,7 @@
 import glob
 import os
 import sys
+from PyPDF2 import PdfReader # pour pouvoir l'utiliser : pip install PyPDF2
 
 class Trier():
     """
@@ -34,20 +35,59 @@ class Trier():
 class Pdf():
     """
     Cette classe extrait le titre, le nom de l'auteur et le table de matière du fichier pdf donne en argument.
-    Il retourne un liste contenant ces informations : titre,auteur,[table des matières]
     """
     def __init__(self,fichier):
-        self.fichier=fichier
-    pass
+        self.fichier= fichier
+        reader = PdfReader(self.fichier)
+        metadata = reader.getDocumentInfo()
+        
+        self.auteur = metadata.author if metadata.author else u'Inconnu'
+        self.titre = metadata.title if metadata.title else self.fichier
+        
+    def __str__(self):
+        return f"{self.titre} de {self.auteur}"
+    
+    def __repr__(self):
+        return f"{self.titre} de {self.auteur}"
 
 class Epub():
     """
     Cette classe extrait le titre, le nom de l'auteur et le table de matière du fichier epub donne en argument.
-    Il retourne un liste contenant ces informations : titre,auteur,[table des matières]
     """
     def __init__(self,fichier):
         self.fichier=fichier
+        self.auteur=''
+        self.titre=''
+        
+    def __str__(self):
+        return f"{self.titre} de {self.auteur}"
+    
+    def __repr__(self):
+        return f"{self.titre} de {self.auteur}"
     pass
+
+class Livres():
+    """
+    Cette classe crée une liste contenant le titre et l'auteur de chaque livre : [[titre,auteur],[titre,auteur],....].
+    """
+    def __init__(self,liste_fichiers):
+        self.livres=[]
+        self.liste_fichiers=liste_fichiers
+        for fichier in self.liste_fichiers:
+            nature=(os.path.splitext(fichier)[1])
+            if nature =='.pdf':
+                livre=Pdf(fichier)
+                self.livres.append([livre.titre,livre.auteur])
+            if nature =='.epub':
+                livre=Epub(fichier)
+                self.livres.append([livre.titre,livre.auteur])
+                
+    def __str__(self):
+        return "\n".join([str(c) for c in self.livres])
+    
+    def __repr__(self):
+        return "\n".join([str(c) for c in self.livres])
+    
 
 class Rapport():
     """
@@ -70,4 +110,6 @@ class MaS(): #Mise à jour des rapports
     dans un fichier de log.
     """
     pass
+
+
 
