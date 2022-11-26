@@ -60,6 +60,7 @@ class Pdf():
             print('Type de page:'.format(str(type(page))))
             text = page.extractText()
             print(text)
+         # ta fonction ne fait qu'afficher le table des matières mais on devrait plutôt l'enregistrer dans une liste pour pouvoir le réutiliser
 
 class Epub():
     """
