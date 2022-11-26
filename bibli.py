@@ -3,6 +3,8 @@ import glob
 import os
 import sys
 from PyPDF2 import PdfReader # pour pouvoir l'utiliser : pip install PyPDF2
+import ebooklib
+from ebooklib import epub # pour pouvoir l'utiliser : pip install ebooklib
 
 class Trier():
     """
@@ -36,13 +38,12 @@ class Pdf():
     """
     Cette classe extrait le titre, le nom de l'auteur et le table de matière du fichier pdf donne en argument.
     """
-    def __init__(self,fichier):
-        self.fichier= fichier
-        reader = PdfReader(self.fichier)
-        metadata = reader.getDocumentInfo()
-        
-        self.auteur = metadata.author if metadata.author else u'Inconnu'
-        self.titre = metadata.title if metadata.title else self.fichier
+    def __init__(self,chemin_fichier):
+        self.fichier= chemin_fichier
+        livre = PdfReader(self.fichier)
+        donnees = livre.getDocumentInfo()
+        self.auteur = donnees.author if donnees.author else u'Inconnu'
+        self.titre = donnees.title if donnees.title else self.fichier
         
     def __str__(self):
         return f"{self.titre} de {self.auteur}"
@@ -54,10 +55,11 @@ class Epub():
     """
     Cette classe extrait le titre, le nom de l'auteur et le table de matière du fichier epub donne en argument.
     """
-    def __init__(self,fichier):
-        self.fichier=fichier
-        self.auteur=''
-        self.titre=''
+    def __init__(self,chemin_fichier):
+        self.fichier=chemin_fichier
+        livre = epub.read_epub(self.fichier)
+        self.auteur=livre.get_metadata('DC', 'creator')[0][0]
+        self.titre=livre.get_metadata('DC', 'title')[0][0]
         
     def __str__(self):
         return f"{self.titre} de {self.auteur}"
@@ -88,7 +90,6 @@ class Livres():
     def __repr__(self):
         return "\n".join([str(c) for c in self.livres])
     
-
 class Rapport():
     """
     Cette classe crée 3 documents (pdf,epub,txt) contenant le nom de chaque auteur des livres et crée 3 autres
