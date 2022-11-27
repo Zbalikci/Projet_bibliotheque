@@ -5,6 +5,7 @@ import os
 from os import path
 import sys
 #################################### TEST POUR TROUVER LA FONCTION ####################################
+
 dossier ="C:/Users/Zeynep/Downloads/livres"
 
 #print(glob.glob("C:/Users/Zeynep/Downloads/livres/ze*"))
@@ -65,39 +66,73 @@ from bibli import Pdf
 livre = Pdf(myFile)
 print(livre)
 
-livre.txt_extract()
-
-# si tu prends ton File comme ça :
-#File = "/Users/mariamadiabymbaye/Documents/livres/gide_immoraliste.pdf"
-
-#c'est plus correct d'écrire 
-#livre=Pdf(File)
-#livre..txt_extract()
-
-#Et non:
-#Pdf.txt_extract(File) --> ça ne devrait pas marchait écrit de cette facon
+print(livre.toc())
 
 #################################### TEST POUR TROUVER LA FONCTION ####################################
 
 import ebooklib
 from ebooklib import epub
+from ebooklib import utils
 
-book = epub.read_epub("C:/Users/Zeynep/Downloads/livres_2/zola_emile_-_l_assommoir.epub")
+myFile2="C:/Users/Zeynep/Downloads/livres_2/zola_emile_-_l_assommoir.epub"
+
+book = epub.read_epub(myFile2)
 
 items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
 
 print(book.get_metadata('DC', 'creator')[0][0])
 print(book.get_metadata('DC', 'title')[0][0])
 
+#print(book.get_metadata('DC', 'description'))
 
+import re
+from bs4 import BeautifulSoup
+
+def item_to_str(item):
+    soup = BeautifulSoup(item.get_content(), 'html.parser')
+    toc = soup.get_text()
+    return toc.replace('\n\n\n\n',"")
+
+
+for item in book.get_items():
+    if item.get_type() == ebooklib.ITEM_NAVIGATION:
+        print('==================================')
+        print('NAME : ', item.get_name())
+        print('==================================')
+        print(item_to_str(item))
+
+####################################       on test le module       ####################################
+from bibli import Epub
+
+livre2 = Epub(myFile2)
+print(livre2)
+print(livre2.toc())
+
+####################################       on test le module       ####################################
+
+Files1=Trier(dossier).DocumentsPDF
+Files2=Trier(dossier).DocumentsEpub
+
+
+# for file in Files1:
+#     l=Pdf(file)
+#     print(l.toc())
+
+for file in Files2:
+    l=Epub(file)
+    print(l.toc())
 ####################################       on test le module       ####################################
 
 from bibli import Livres
 
-Files1=Trier(dossier).DocumentsPDF
-Books1=Livres(Files1)
-print(Books1)
 
-Files2=Trier(dossier).DocumentsEpub
-Books2=Livres(Files2)
-print(Books2)
+# Files1=Trier(dossier).DocumentsPDF
+# Books1=Livres(Files1)
+# print(Books1)
+
+# Files2=Trier(dossier).DocumentsEpub
+# Books2=Livres(Files2)
+# print(Books2)
+# print(type(Files1))
+# print(len(Files1))
+
