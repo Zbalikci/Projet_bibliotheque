@@ -57,8 +57,6 @@ class Pdf():
         with open(self.fichier,'rb') as f:
             pdf = PdfReader(f)
             page = pdf.getPage(1)
-            print(page)
-            print('Type de page:'.format(str(type(page))))
             text = page.extractText()
             return text
 
@@ -71,6 +69,9 @@ class Epub():
         livre = epub.read_epub(self.fichier)
         self.auteur=livre.get_metadata('DC', 'creator')[0][0]
         self.titre=livre.get_metadata('DC', 'title')[0][0]
+        self.language=livre.get_metadata('DC', 'language')[0][0]
+        if self.language=='fr':
+            self.language='En français'
         
     def toc(self):
         book = epub.read_epub(self.fichier)
@@ -130,7 +131,3 @@ class MaS(): #Mise à jour des rapports
     dans un fichier de log.
     """
     pass
-
-
-
-
