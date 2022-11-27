@@ -47,6 +47,7 @@ print(Trier(dossier))
 
 #################################### TEST POUR TROUVER LA FONCTION ####################################
 from PyPDF2 import PdfReader
+from langdetect import detect # installer le module langdetect.
 
 myFile="C:/Users/Zeynep/Downloads/livres_2/gide_immoraliste.pdf"
 
@@ -54,6 +55,7 @@ reader = PdfReader(myFile)
 number_of_pages = len(reader.pages)
 page = reader.pages[0]
 text = page.extract_text()
+print("la langue du fichier est en :" ,detect(text)) # detect ne marche que pour un bout de texte.
 
 metadata = reader.getDocumentInfo()
 print(reader.getXmpMetadata())
