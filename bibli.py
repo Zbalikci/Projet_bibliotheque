@@ -2,9 +2,11 @@
 import glob
 import os
 import sys
-from PyPDF2 import PdfReader # pour pouvoir l'utiliser : pip install PyPDF2
-import ebooklib
-from ebooklib import epub # pour pouvoir l'utiliser : pip install ebooklib
+import PyPDF2 # pour pouvoir l'utiliser : pip install PyPDF2
+from PyPDF2 import PdfReader 
+import ebooklib # pour pouvoir l'utiliser : pip install ebooklib
+from ebooklib import epub 
+from bs4 import BeautifulSoup
 
 class Trier():
     """
@@ -50,17 +52,15 @@ class Pdf():
     
     def __repr__(self):
         return f"{self.titre} de {self.auteur}"
-
-    def txt_extract(self):
-         with open(self.fichier,'rb') as f:
-              #pdf = PdfFileReader(f)
-              pdf = PdfReader(f)
-              page = pdf.getPage(1)
-              print(page)
-              print('Type de page:'.format(str(type(page))))
-              text = []
-              text.append(page.extractText())
-              print(text)
+    
+    def toc(self):
+        with open(self.fichier,'rb') as f:
+            pdf = PdfReader(f)
+            page = pdf.getPage(1)
+            print(page)
+            print('Type de page:'.format(str(type(page))))
+            text = page.extractText()
+            return text
 
 class Epub():
     """
@@ -72,6 +72,14 @@ class Epub():
         self.auteur=livre.get_metadata('DC', 'creator')[0][0]
         self.titre=livre.get_metadata('DC', 'title')[0][0]
         
+    def toc(self):
+        book = epub.read_epub(self.fichier)
+        for item in book.get_items():
+            if item.get_type() == ebooklib.ITEM_NAVIGATION:
+                soup = BeautifulSoup(item.get_content(), 'html.parser')
+        toc = soup.get_text()
+        return toc.replace('\n\n\n\n',"")
+
     def __str__(self):
         return f"{self.titre} de {self.auteur}"
     
@@ -100,6 +108,7 @@ class Livres():
     def __repr__(self):
         return "\n".join([str(c) for c in self.livres])
     
+
 class Rapport():
     """
     Cette classe crée 3 documents (pdf,epub,txt) contenant le nom de chaque auteur des livres et crée 3 autres
@@ -121,6 +130,7 @@ class MaS(): #Mise à jour des rapports
     dans un fichier de log.
     """
     pass
+
 
 
 
