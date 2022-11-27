@@ -10,9 +10,8 @@ from bs4 import BeautifulSoup
 
 class Trier():
     """
-    Cette classe trie les fichiers dans un dossier donne en argument.
-    Il crée 1 liste dans laquelle se trouve tous les fichiers pdf et une autre liste
-    dans laquelle se trouve tous les fichiers epub du dossier donné en argument.
+    Cette classe trie les fichiers dans un dossier donne en argument. Il crée 1 liste dans laquelle se trouve tous les fichiers pdf
+    et une autre liste dans laquelle se trouve tous les fichiers epub du dossier donné en argument.
     """
     def __init__(self,dossier):
         self.dossier=glob.glob(os.path.join(dossier,"*"))
@@ -38,7 +37,7 @@ class Trier():
 
 class Pdf():
     """
-    Cette classe extrait le titre, le nom de l'auteur et le table de matière du fichier pdf donne en argument.
+    Cette classe extrait le titre,le nombre de pages le nom de l'auteur, le langage et le table de matière du fichier pdf donne en argument.
     """
     def __init__(self,chemin_fichier):
         self.fichier= chemin_fichier
@@ -67,16 +66,16 @@ class Pdf():
 
 class Epub():
     """
-    Cette classe extrait le titre, le nom de l'auteur et le table de matière du fichier epub donne en argument.
+    Cette classe extrait le titre, le nom de l'auteur, le langage et le table de matière du fichier epub donne en argument.
     """
     def __init__(self,chemin_fichier):
         self.fichier=chemin_fichier
         livre = epub.read_epub(self.fichier)
         self.auteur=livre.get_metadata('DC', 'creator')[0][0]
         self.titre=livre.get_metadata('DC', 'title')[0][0]
-        self.language=livre.get_metadata('DC', 'language')[0][0]
-        if self.language=='fr':
-            self.language='En français'
+        self.langage=livre.get_metadata('DC', 'language')[0][0]
+        if self.langage=='fr':
+            self.langage='En français'
         
     def toc(self):
         book = epub.read_epub(self.fichier)
@@ -136,4 +135,3 @@ class MaS(): #Mise à jour des rapports
     dans un fichier de log.
     """
     pass
-
