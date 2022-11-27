@@ -46,6 +46,10 @@ class Pdf():
         donnees = livre.getDocumentInfo()
         self.auteur = donnees.author if donnees.author else u'Inconnu'
         self.titre = donnees.title if donnees.title else self.fichier
+        try:
+            self.pages= len(livre.pages)
+        except :
+            self.pages=0
         
     def __str__(self):
         return f"{self.titre} de {self.auteur}"
@@ -54,11 +58,12 @@ class Pdf():
         return f"{self.titre} de {self.auteur}"
     
     def toc(self):
-        with open(self.fichier,'rb') as f:
-            pdf = PdfReader(f)
-            page = pdf.getPage(1)
-            text = page.extractText()
-            return text
+        if self.pages>=2:
+            with open(self.fichier,'rb') as f:
+                pdf = PdfReader(f)
+                page = pdf.getPage(1)
+                text = page.extractText()
+                return text
 
 class Epub():
     """
@@ -131,3 +136,4 @@ class MaS(): #Mise à jour des rapports
     dans un fichier de log.
     """
     pass
+
