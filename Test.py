@@ -4,6 +4,7 @@ import numpy as np
 import os
 from os import path
 import sys
+
 #################################### TEST POUR TROUVER LA FONCTION ####################################
 
 dossier ="C:/Users/Zeynep/Downloads/livres"
@@ -55,6 +56,7 @@ page = reader.pages[0]
 text = page.extract_text()
 
 metadata = reader.getDocumentInfo()
+print(reader.getXmpMetadata())
 
 author = metadata.author if metadata.author else u'Unknown'
 title = metadata.title if metadata.title else myFile
@@ -78,12 +80,13 @@ myFile2="C:/Users/Zeynep/Downloads/livres_2/zola_emile_-_l_assommoir.epub"
 
 book = epub.read_epub(myFile2)
 
+
 items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
 
 print(book.get_metadata('DC', 'creator')[0][0])
 print(book.get_metadata('DC', 'title')[0][0])
+print(book.get_metadata('DC', 'language')[0][0])
 
-#print(book.get_metadata('DC', 'description'))
 
 import re
 from bs4 import BeautifulSoup
@@ -114,13 +117,16 @@ Files1=Trier(dossier).DocumentsPDF
 Files2=Trier(dossier).DocumentsEpub
 
 
-# for file in Files1:
-#     l=Pdf(file)
-#     print(l.toc())
+for file in Files1:
+    l=Pdf(file)
+    print(l.toc())
 
 for file in Files2:
     l=Epub(file)
     print(l.toc())
+    #print(l.language)
+    
+    
 ####################################       on test le module       ####################################
 
 from bibli import Livres
@@ -135,4 +141,5 @@ from bibli import Livres
 # print(Books2)
 # print(type(Files1))
 # print(len(Files1))
+
 
