@@ -4,6 +4,7 @@ import numpy as np
 import os
 from os import path
 import sys
+import fitz  # pour pouvoir l'utiliser : pip install PyMuPDF
 
 #################################### TEST POUR TROUVER LA FONCTION ####################################
 
@@ -47,7 +48,6 @@ print(Trier(dossier))
 
 #################################### TEST POUR TROUVER LA FONCTION ####################################
 from PyPDF2 import PdfReader
-from langdetect import detect # installer le module langdetect.
 
 myFile="C:/Users/Zeynep/Downloads/livres_2/gide_immoraliste.pdf"
 
@@ -55,35 +55,32 @@ reader = PdfReader(myFile)
 number_of_pages = len(reader.pages)
 page = reader.pages[0]
 text = page.extract_text()
-print("la langue du fichier est en :" ,detect(text)) # detect ne marche que pour un bout de texte.
 
 metadata = reader.getDocumentInfo()
-print(reader.getXmpMetadata())
 
 author = metadata.author if metadata.author else u'Unknown'
 title = metadata.title if metadata.title else myFile
 print (author + "|" + title )
+
+# un autre choix de module :
+
+# doc = fitz.open(myFile)
+# doc.get_toc()
+# doc.metadata['title']
+# doc.metadata['author']
+# doc.page_count
 
 ####################################       on test le module       ####################################
 from bibli import Pdf
 
 livre = Pdf(myFile)
 print(livre)
-
 print(livre.toc())
-
-from bibli2 import PDF
-
-livre1 = PDF(myFile)
-print(livre1)
-
-print(livre1.toc())
 
 #################################### TEST POUR TROUVER LA FONCTION ####################################
 
 import ebooklib
 from ebooklib import epub
-from ebooklib import utils
 
 myFile2="C:/Users/Zeynep/Downloads/livres_2/zola_emile_-_l_assommoir.epub"
 
@@ -96,9 +93,16 @@ print(book.get_metadata('DC', 'creator')[0][0])
 print(book.get_metadata('DC', 'title')[0][0])
 print(book.get_metadata('DC', 'language')[0][0])
 
+# un autre choix de module :
 
-import re
-from bs4 import BeautifulSoup
+# doc = fitz.open(myFile2)
+# doc.get_toc()
+# doc.metadata['title']
+# doc.metadata['author']
+# doc.page_count
+
+#pour obtenir le table des matières (ne donne pas le page des chapitres):
+from bs4 import BeautifulSoup #pour convertir HTML en STR
 
 def item_to_str(item):
     soup = BeautifulSoup(item.get_content(), features="xml")
@@ -125,16 +129,14 @@ print(livre2.toc())
 Files1=Trier(dossier).DocumentsPDF
 Files2=Trier(dossier).DocumentsEpub
 
-
 for file in Files1:
     l=Pdf(file)
     print(l.toc())
 
+
 for file in Files2:
     l=Epub(file)
     print(l.toc())
-    #print(l.language)
-    
     
 ####################################       on test le module       ####################################
 
@@ -150,5 +152,4 @@ from bibli import Livres
 # print(Books2)
 # print(type(Files1))
 # print(len(Files1))
-
 
