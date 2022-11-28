@@ -5,9 +5,10 @@ import os
 from os import path
 import sys
 import fitz  # pour pouvoir l'utiliser : pip install PyMuPDF
+import langdetect # pour pouvoir l'utiliser : pip install langdetect
+from langdetect import detect 
 
 #################################### TEST POUR TROUVER LA FONCTION ####################################
-
 dossier ="C:/Users/Zeynep/Downloads/livres"
 
 #print(glob.glob("C:/Users/Zeynep/Downloads/livres/ze*"))
@@ -41,7 +42,7 @@ for doc in documents:
         
 print(len(DocumentsPDF)+len(DocumentsEpub)+len(DocumentsZip)+len(DocumentsAutres)) #doit afficher 4323
 
-####################################       on test le module       ####################################
+###################################      on test notre module      ###################################
 from bibli import Trier
 
 print(Trier(dossier))
@@ -55,7 +56,7 @@ reader = PdfReader(myFile)
 number_of_pages = len(reader.pages)
 page = reader.pages[0]
 text = page.extract_text()
-
+print("la langue du fichier est en :" ,detect(text)) # detect ne marche que pour un bout de texte.
 metadata = reader.getDocumentInfo()
 
 author = metadata.author if metadata.author else u'Unknown'
@@ -70,15 +71,14 @@ print (author + "|" + title )
 # doc.metadata['author']
 # doc.page_count
 
-####################################       on test le module       ####################################
-from bibli import Pdf
+###################################      on test notre module      ###################################
+from bibli import PDF
 
-livre = Pdf(myFile)
+livre = PDF(myFile)
 print(livre)
 print(livre.toc())
 
 #################################### TEST POUR TROUVER LA FONCTION ####################################
-
 import ebooklib
 from ebooklib import epub
 
@@ -117,20 +117,19 @@ for item in book.get_items():
         print('==================================')
         print(item_to_str(item))
 
-####################################       on test le module       ####################################
+###################################      on test notre module      ###################################
 from bibli import Epub
 
 livre2 = Epub(myFile2)
 print(livre2)
 print(livre2.toc())
 
-####################################       on test le module       ####################################
-
+###################################      on test notre module      ###################################
 Files1=Trier(dossier).DocumentsPDF
 Files2=Trier(dossier).DocumentsEpub
 
 for file in Files1:
-    l=Pdf(file)
+    l=PDF(file)
     print(l.toc())
 
 
@@ -139,17 +138,12 @@ for file in Files2:
     print(l.toc())
     
 ####################################       on test le module       ####################################
-
 from bibli import Livres
 
+Files1=Trier(dossier).DocumentsPDF
+Books1=Livres(Files1)
+print(Books1)
 
-# Files1=Trier(dossier).DocumentsPDF
-# Books1=Livres(Files1)
-# print(Books1)
-
-# Files2=Trier(dossier).DocumentsEpub
-# Books2=Livres(Files2)
-# print(Books2)
-# print(type(Files1))
-# print(len(Files1))
-
+Files2=Trier(dossier).DocumentsEpub
+Books2=Livres(Files2)
+print(Books2)
