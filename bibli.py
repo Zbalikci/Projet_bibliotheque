@@ -35,7 +35,7 @@ class Trier():
     def __repr__(self):
         return f"Il y a {len(self.DocumentsPDF)+len(self.DocumentsEpub)+len(self.DocumentsZip)+len(self.DocumentsAutres)} fichiers dans ce dossier"
 
- class Pdf():
+class Pdf():
     """
     Cette classe extrait le titre,le nombre de pages le nom de l'auteur, le langage et le table de matière du fichier pdf donne en argument.
     """
@@ -63,7 +63,7 @@ class Trier():
                 page = pdf.getPage(1)
                 text = page.extractText()
                 return text
-#  ta fonction toc marche pas
+
 class Epub():
     """
     Cette classe extrait le titre, le nom de l'auteur, le langage et le table de matière du fichier epub donne en argument.
@@ -81,7 +81,7 @@ class Epub():
         book = epub.read_epub(self.fichier)
         for item in book.get_items():
             if item.get_type() == ebooklib.ITEM_NAVIGATION:
-                soup = BeautifulSoup(item.get_content(), 'html.parser')
+                soup = BeautifulSoup(item.get_content(), features="xml")
         toc = soup.get_text()
         return toc.replace('\n\n\n\n',"")
 
