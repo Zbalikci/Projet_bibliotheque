@@ -7,6 +7,8 @@ from PyPDF2 import PdfReader
 import ebooklib # pour pouvoir l'utiliser : pip install ebooklib
 from ebooklib import epub 
 from bs4 import BeautifulSoup
+from pikepdf import Pdf
+import fitz  # pour pouvoir l'utiliser : pip install PyMuPDF
 
 class Trier():
     """
@@ -118,9 +120,15 @@ class Rapport():
     """
     Cette classe crée 3 documents (pdf,epub,txt) contenant le nom de chaque auteur des livres et crée 3 autres
     documents (pdf,epub,txt) contenant le titre de chaque livre.
-    3 documents contenant : [ [auteur, (livre1,livre2,...)] , [auteur, (livre1,livre2,...)] ,... ]
-    3 autres documents contenant : [[titre,auteur],[titre,auteur],....].
+    3 documents contenant : [ [auteur, (livre1,livre2,...)] , [auteur, (livre1,livre2,...)] , ... ]
+    3 autres documents contenant : [ [titre,auteur,langage], [titre,auteur,langage] , ....].
     
+    """
+    pass
+
+class ToC():
+    """
+    Cette classe crée 3 documents (pdf,epub,txt) contenant le table des matières des livres dans le dossier donne en argument.
     """
     pass
 
@@ -135,3 +143,4 @@ class MaS(): #Mise à jour des rapports
     dans un fichier de log.
     """
     pass
+
