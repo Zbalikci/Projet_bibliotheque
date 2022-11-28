@@ -6,9 +6,11 @@ import PyPDF2 # pour pouvoir l'utiliser : pip install PyPDF2
 from PyPDF2 import PdfReader 
 import ebooklib # pour pouvoir l'utiliser : pip install ebooklib
 from ebooklib import epub 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup #pour convertir HTML en STR
 from pikepdf import Pdf
 import fitz  # pour pouvoir l'utiliser : pip install PyMuPDF
+import langdetect # pour pouvoir l'utiliser : pip install langdetect
+from langdetect import detect 
 
 class Trier():
     """
@@ -37,7 +39,7 @@ class Trier():
     def __repr__(self):
         return f"Il y a {len(self.DocumentsPDF)+len(self.DocumentsEpub)+len(self.DocumentsZip)+len(self.DocumentsAutres)} fichiers dans ce dossier"
 
-class Pdf():
+class PDF():
     """
     Cette classe extrait le titre,le nombre de pages le nom de l'auteur, le langage et le table de matière du fichier pdf donne en argument.
     """
@@ -51,6 +53,16 @@ class Pdf():
             self.pages= len(livre.pages)
         except :
             self.pages=0
+        if self.pages>4:
+            page = livre.pages[4]
+            text = page.extract_text()
+            try:
+                self.langage=detect(text)
+            except:
+                 self.langage='Inconnu'
+        else :
+            self.langage='Inconnu'
+        
         
     def __str__(self):
         return f"{self.titre} de {self.auteur}"
@@ -58,13 +70,19 @@ class Pdf():
     def __repr__(self):
         return f"{self.titre} de {self.auteur}"
     
+    # l'ancienne :
+    # def toc(self):
+    #     if self.pages>=2:
+    #         with open(self.fichier,'rb') as f:
+    #             pdf = PdfReader(f)
+    #             page = pdf.getPage(1)
+    #             text = page.extractText()
+    #             return text
+    # le nouveau : (il vaut mieux prendre celui-là
+    
     def toc(self):
-        if self.pages>=2:
-            with open(self.fichier,'rb') as f:
-                pdf = PdfReader(f)
-                page = pdf.getPage(1)
-                text = page.extractText()
-                return text
+        livre = fitz.open(self.fichier)
+        return livre.get_toc()
 
 class Epub():
     """
@@ -76,8 +94,6 @@ class Epub():
         self.auteur=livre.get_metadata('DC', 'creator')[0][0]
         self.titre=livre.get_metadata('DC', 'title')[0][0]
         self.langage=livre.get_metadata('DC', 'language')[0][0]
-        if self.langage=='fr':
-            self.langage='En français'
         
     def toc(self):
         book = epub.read_epub(self.fichier)
@@ -95,7 +111,8 @@ class Epub():
 
 class Livres():
     """
-    Cette classe crée une liste contenant le titre et l'auteur de chaque livre : [[titre,auteur],[titre,auteur],....].
+    Cette classe crée une liste contenant le titre, l'auteur et le langage de chaque livre :
+    [ [titre,auteur,langage], [titre,auteur,langage] , ....].
     """
     def __init__(self,liste_fichiers):
         self.livres=[]
@@ -103,11 +120,11 @@ class Livres():
         for fichier in self.liste_fichiers:
             nature=(os.path.splitext(fichier)[1])
             if nature =='.pdf':
-                livre=Pdf(fichier)
-                self.livres.append([livre.titre,livre.auteur])
+                livre=PDF(fichier)
+                self.livres.append([livre.titre,livre.auteur,livre.langage])
             if nature =='.epub':
                 livre=Epub(fichier)
-                self.livres.append([livre.titre,livre.auteur])
+                self.livres.append([livre.titre,livre.auteur,livre.langage])
                 
     def __str__(self):
         return "\n".join([str(c) for c in self.livres])
@@ -143,4 +160,3 @@ class MaS(): #Mise à jour des rapports
     dans un fichier de log.
     """
     pass
-
