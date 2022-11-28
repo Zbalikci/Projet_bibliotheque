@@ -72,6 +72,13 @@ print(livre)
 
 print(livre.toc())
 
+from bibli2 import PDF
+
+livre1 = PDF(myFile)
+print(livre1)
+
+print(livre1.toc())
+
 #################################### TEST POUR TROUVER LA FONCTION ####################################
 
 import ebooklib
@@ -94,7 +101,7 @@ import re
 from bs4 import BeautifulSoup
 
 def item_to_str(item):
-    soup = BeautifulSoup(item.get_content(), 'html.parser')
+    soup = BeautifulSoup(item.get_content(), features="xml")
     toc = soup.get_text()
     return toc.replace('\n\n\n\n',"")
 
