@@ -78,7 +78,7 @@ class PDF():
     #             page = pdf.getPage(1)
     #             text = page.extractText()
     #             return text
-    # le nouveau : (il vaut mieux prendre celui-là
+    # le nouveau :
     
     def toc(self):
         livre = fitz.open(self.fichier)
@@ -95,6 +95,13 @@ class Epub():
         self.titre=livre.get_metadata('DC', 'title')[0][0]
         self.langage=livre.get_metadata('DC', 'language')[0][0]
         
+        #ou bien :
+        # self.titre=livre.metadata['title']
+        # self.langage=livre.metadata['author']
+        
+        livre = fitz.open(self.fichier)
+        self.pages=livre.page_count
+        
     def toc(self):
         book = epub.read_epub(self.fichier)
         for item in book.get_items():
@@ -102,6 +109,10 @@ class Epub():
                 soup = BeautifulSoup(item.get_content(), features="xml")
         toc = soup.get_text()
         return toc.replace('\n\n\n\n',"")
+    #ou bien :
+    # def toc(self):
+        # livre = fitz.open(self.fichier)
+        # return .get_toc()
 
     def __str__(self):
         return f"{self.titre} de {self.auteur}"
