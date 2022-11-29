@@ -146,8 +146,8 @@ class Rapport():
     """
     def __init__(self, dossier):
         
-        livresPDF=Trier(dossier).DocumentsPDF #liste des livres pdf (avec le chemin des fichiers)
-        livresEpub=Trier(dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
+        livresPDF=Trier(dossier).DocumentsPDF[:20] #liste des livres pdf (avec le chemin des fichiers)
+        livresEpub=Trier(dossier).DocumentsEpub[:10] #liste des livres epub (avec le chemin des fichiers)
         
         self.rapport=Livres(livresEpub).livres #liste des livres : [ [titre, auteur, langage] , ... ]
         for livre in Livres(livresPDF).livres:
@@ -202,19 +202,28 @@ class Rapport():
         doc = aw.Document("La liste des auteurs.txt")
         doc.save("La liste des auteurs.epub",aw.SaveFormat.EPUB)
         
+
 class ToC():
     """
     Cette classe crée 3 documents (pdf,epub,txt) contenant le table des matières de chacun des livres dans le dossier donne en argument.
     """
     def __init__(self,dossier):
-        livresPDF=Trier(dossier).DocumentsPDF #liste des livres pdf (avec le chemin des fichiers)
-        livresEpub=Trier(dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
-        
+        livresPDF=Trier(dossier).DocumentsPDF[:10] #liste des livres pdf (avec le chemin des fichiers)
+        livresEpub=Trier(dossier).DocumentsEpub[:10] #liste des livres epub (avec le chemin des fichiers)
+                
         for file in livresPDF:
             livre = PDF(file)
             toc= livre.toc()
-            #with open(f"Le table de matière de {livre.titre}.txt","w") as f :
-                 #f.write("Livre 1 : \n Le titre : "+self.rapport[0][0])
+            with open(f"Le table des matières de {livre.titre}.txt","w") as f :
+               f.write("\n"+str(toc[0]))
+               for i in range(1,len (toc)):
+                   f.write(f"\n {str(toc[i])}")
+            # conversion de la liste txt en pdf:           
+            doc = aw.Document(f"Le table des matières de {livre.titre}.txt")
+            doc.save(f"Le table des matières de {livre.titre}.pdf",aw.SaveFormat.PDF)
+            # conversion de la liste txt en epub
+            doc = aw.Document(f"Le table des matières de {livre.titre}.txt")
+            doc.save(f"Le table des matières de {livre.titre}.epub",aw.SaveFormat.EPUB)
             
         for file in livresEpub:
             livre = Epub(file)
