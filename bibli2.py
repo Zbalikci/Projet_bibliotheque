@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import glob
 import os
 import sys
@@ -186,11 +188,6 @@ class Rapport():
         # conversion de la liste txt en epub
         doc = aw.Document("La liste des ouvrages.txt")
         doc.save("La liste des ouvrages.epub",aw.SaveFormat.EPUB)
-        
-        
-        
-        
-        
        
     def __str__(self):
         return "\n".join([str(c) for c in self.rapport])
@@ -207,19 +204,31 @@ class ToC():
     """
     def __init__(self,dossier):
         livresPDF=Trier(dossier).DocumentsPDF #liste des livres pdf (avec le chemin des fichiers)
-        livresEpub=Trier(dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
+        # livresEpub=Trier(dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
         
         for file in livresPDF:
             livre = PDF(file)
-            toc= livre.toc()
-            #with open(f"Le table de matière de {livre.titre}.txt","w") as f :
-                 #f.write("Livre 1 : \n Le titre : "+self.rapport[0][0])
+            self.toc= livre.toc()
+            with open(f"Le table de matière de {livre.titre} de l'auteur {livre.auteur}.txt","w") as f :
+               f.write("\n"+str(self.toc[0]))
+               for i in range(1,len (self.toc)):
+                   f.write(f"\n {str(self.toc[i])}")
+            # conversion de la liste txt en pdf:           
+            doc = aw.Document(f"Le table de matière de {livre.titre} de l'auteur {livre.auteur}.txt")
+            doc.save(f"Le table de matière de {livre.titre} de l'auteur {livre.auteur}.pdf",aw.SaveFormat.PDF)
+            # conversion de la liste txt en epub
+            doc = aw.Document(f"Le table de matière de {livre.titre} de l'auteur {livre.auteur}.txt")
+            doc.save(f"Le table de matière de {livre.titre} de l'auteur {livre.auteur}.epub",aw.SaveFormat.EPUB)
             
-        for file in livresEpub:
-            livre = Epub(file)
-            toc= livre.toc()
-            w#ith open("La liste des toc.txt","w") as f :
-                 #f.write("Livre 1 : \n Le titre : "+self.rapport[0][0])
+                   
+       
+    def __str__(self):
+          return "\n".join([str(c) for c in self.toc])
+
+    def __repr__(self):
+          return "\n".join([str(c) for c in self.toc])
+    def __iter__(self):
+        return iter(self.toc) 
 
 
 class MaS(): #Mise à jour des rapports
