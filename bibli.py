@@ -152,6 +152,45 @@ class Rapport():
     3 autres documents contenant : [ [titre,auteur,langage], [titre,auteur,langage] , ....].
     
     """
+    # Ma classe n'est pas complète et ça ne marche pas bien , mais voici l'idée que jai :
+    def __init__(self,liste_fichiers):
+        self.livres=[]
+        self.liste_fichiers=liste_fichiers
+        for fichier in self.liste_fichiers:
+            nature=(os.path.splitext(self.fichier)[1])
+            if nature =='.pdf':
+               livre=PDF(self.fichier)
+               self.livres.append([livre.titre,livre.auteur,livre.langage])
+               pdf = FPDF()
+               pdf.add_page()
+               pdf.set_xy(0, 0)
+               pdf.set_font('arial', 'B', 13.0)
+               pdf.cell(ln=0, h=5.0, align='L', w=0, txt=self.livres, border=0)
+               pdf.output('rapport_pdf.pdf', 'F')
+               
+               with open("rapport_pdf.txt","w") as f :
+                    f.write(self.livres)
+                    
+            if nature =='.epub':
+                livre=Epub(fichier)
+                self.livres.append([livre.titre,livre.auteur,livre.langage])
+                pdf2 = FPDF()
+                pdf2.add_page()
+                pdf2.set_xy(0, 0)
+                pdf2.set_font('arial', 'B', 13.0)
+                pdf2.cell(ln=0, h=5.0, align='L', w=0, txt=self.livres, border=0)
+                pdf2.output('rapport_epub.pdf', 'F')
+                
+                with open("rapport_epub.txt","w") as f :
+                    f.write(self.livres)
+            
+       # tu me diras ce qu'on peut améliorer.     
+    def __str__(self):
+        return "\n".join([str(c) for c in self.livres])
+    
+    def __repr__(self):
+        return "\n".join([str(c) for c in self.livres])     
+            
     pass
 
 class ToC():
