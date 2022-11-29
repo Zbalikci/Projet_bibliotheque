@@ -145,7 +145,11 @@ class Livres():
     
     def __iter__(self):
         return iter(self.livres)
+
+    def __getitem__(self,i):
+        return self.livres[i]
     
+#"\n".join([str(c) for c in self.livres])
 
 class Rapport():
     """
@@ -161,26 +165,24 @@ class Rapport():
         livresPDF=Trier(dossier).DocumentsPDF #liste des livres pdf (avec le chemin des fichiers)
         livresEpub=Trier(dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
         
-        self.rapport=Livres(livresPDF) #liste des livres : [ [titre, auteur, langage] , ... ]
-        for livre in Livres(livresEpub):
+        self.rapport=Livres(livresEpub).livres #liste des livres : [ [titre, auteur, langage] , ... ]
+        for livre in Livres(livresPDF).livres:
             self.rapport.append(livre)
-        #création du fichier pdf  avec titre,auteur et langue issus d'un pdf:
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_xy(0, 0)
-        pdf.set_font('arial', 'B', 13.0)
-        pdf.cell(ln=0, h=5.0, align='L', w=0, txt=self.rapport, border=0)
-        pdf.output('rapport_pdf.pdf', 'F')
-                
-        #création du fichier txt :
-        with open("rapport_pdf.txt","w") as f :
-            f.write(self.rapport)
-            
+
+        with open("rapport.txt","w") as f :
+            f.write("Livre 1 : \n Le titre : "+self.rapport[0][0])
+        with open("rapport.txt","a+") as f :
+            f.write("\n L'auteur : "+self.rapport[0][1])
+            f.write("\n Le langage : "+self.rapport[0][2])
+
     def __str__(self):
         return "\n".join([str(c) for c in self.rapport])
     
     def __repr__(self):
-        return "\n".join([str(c) for c in self.rapport])     
+        return "\n".join([str(c) for c in self.rapport]) 
+
+    def __iter__(self):
+        return iter(self.rapport) 
 
 class ToC():
     """
