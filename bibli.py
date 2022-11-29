@@ -169,11 +169,16 @@ class Rapport():
         for livre in Livres(livresPDF).livres:
             self.rapport.append(livre)
 
-        with open("rapport.txt","w") as f :
+        with open("La liste des ouvrages.txt","w") as f :
             f.write("Livre 1 : \n Le titre : "+self.rapport[0][0])
-        with open("rapport.txt","a+") as f :
+        
+        with open("La liste des ouvrages.txt","a+") as f :
             f.write("\n L'auteur : "+self.rapport[0][1])
             f.write("\n Le langage : "+self.rapport[0][2])
+            for i in range(1,len (self.rapport)):
+                f.write(f"\nLivre {i} : \n Le titre : {self.rapport[i][0]}")
+                f.write("\n L'auteur : "+self.rapport[i][1])
+                f.write("\n Le langage : "+self.rapport[i][2])
 
     def __str__(self):
         return "\n".join([str(c) for c in self.rapport])
