@@ -59,7 +59,7 @@ class PDF():
             try:
                 self.langage=detect(text)
             except:
-                 self.langage='Inconnu'
+                self.langage='Inconnu'
         else :
             self.langage='Inconnu'
         
@@ -143,6 +143,9 @@ class Livres():
     def __repr__(self):
         return "\n".join([str(c) for c in self.livres])
     
+    def __iter__(self):
+        return iter(self.livres)
+    
 
 class Rapport():
     """
@@ -153,50 +156,31 @@ class Rapport():
     
     """
     # Ma classe n'est pas complète et ça ne marche pas bien , mais voici l'idée que jai :
-    def __init__(self,liste_fichiers):
-        self.livres=[]
-        self.liste_fichiers=liste_fichiers
-        for fichier in self.liste_fichiers:
-            nature=(os.path.splitext(self.fichier)[1])
-            if nature =='.pdf':
-               livre=PDF(self.fichier)
-               self.livres.append([livre.titre,livre.auteur,livre.langage])
-                #création du fichier pdf  avec titre,auteur et langue issus d'un pdf:
-               pdf = FPDF()
-               pdf.add_page()
-               pdf.set_xy(0, 0)
-               pdf.set_font('arial', 'B', 13.0)
-               pdf.cell(ln=0, h=5.0, align='L', w=0, txt=self.livres, border=0)
-               pdf.output('rapport_pdf.pdf', 'F')
+    def __init__(self, dossier):
+        
+        livresPDF=Trier(dossier).DocumentsPDF #liste des livres pdf (avec le chemin des fichiers)
+        livresEpub=Trier(dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
+        
+        self.rapport=Livres(livresPDF) #liste des livres : [ [titre, auteur, langage] , ... ]
+        for livre in Livres(livresEpub):
+            self.rapport.append(livre)
+        #création du fichier pdf  avec titre,auteur et langue issus d'un pdf:
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_xy(0, 0)
+        pdf.set_font('arial', 'B', 13.0)
+        pdf.cell(ln=0, h=5.0, align='L', w=0, txt=self.rapport, border=0)
+        pdf.output('rapport_pdf.pdf', 'F')
                 
-                #création du fichier txt :
-               
-               with open("rapport_pdf.txt","w") as f :
-                    f.write(self.livres)
-                    
-            if nature =='.epub':
-                livre=Epub(fichier)
-                self.livres.append([livre.titre,livre.auteur,livre.langage])
-                #création du fichier pdf  avec titre,auteur et langue issus d'un epub:
-                pdf2 = FPDF()
-                pdf2.add_page()
-                pdf2.set_xy(0, 0)
-                pdf2.set_font('arial', 'B', 13.0)
-                pdf2.cell(ln=0, h=5.0, align='L', w=0, txt=self.livres, border=0)
-                pdf2.output('rapport_epub.pdf', 'F')
-                
-                #création du fichier txt :
-                with open("rapport_epub.txt","w") as f :
-                    f.write(self.livres)
+        #création du fichier txt :
+        with open("rapport_pdf.txt","w") as f :
+            f.write(self.rapport)
             
-       # tu me diras ce qu'on peut améliorer parce que je crois pas que ça marche bien.     
     def __str__(self):
-        return "\n".join([str(c) for c in self.livres])
+        return "\n".join([str(c) for c in self.rapport])
     
     def __repr__(self):
-        return "\n".join([str(c) for c in self.livres])     
-            
-    pass
+        return "\n".join([str(c) for c in self.rapport])     
 
 class ToC():
     """
