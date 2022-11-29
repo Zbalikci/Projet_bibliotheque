@@ -209,16 +209,16 @@ class ToC():
         for file in livresPDF:
             livre = PDF(file)
             self.toc= livre.toc()
-            with open(f"Le table de matière de {livre.titre} de l'auteur {livre.auteur}.txt","w") as f :
+            with open(f"Le table de matière de {livre.titre} de l'auteur : {livre.auteur}.txt","w") as f :
                f.write("\n"+str(self.toc[0]))
                for i in range(1,len (self.toc)):
                    f.write(f"\n {str(self.toc[i])}")
             # conversion de la liste txt en pdf:           
-            doc = aw.Document(f"Le table de matière de {livre.titre} de l'auteur {livre.auteur}.txt")
-            doc.save(f"Le table de matière de {livre.titre} de l'auteur {livre.auteur}.pdf",aw.SaveFormat.PDF)
+            doc = aw.Document(f"Le table de matière de {livre.titre} de l'auteur : {livre.auteur}.txt")
+            doc.save(f"Le table de matière de {livre.titre} de l'auteur : {livre.auteur}.pdf",aw.SaveFormat.PDF)
             # conversion de la liste txt en epub
-            doc = aw.Document(f"Le table de matière de {livre.titre} de l'auteur {livre.auteur}.txt")
-            doc.save(f"Le table de matière de {livre.titre} de l'auteur {livre.auteur}.epub",aw.SaveFormat.EPUB)
+            doc = aw.Document(f"Le table de matière de {livre.titre} de l'auteur : {livre.auteur}.txt")
+            doc.save(f"Le table de matière de {livre.titre} de l'auteur : {livre.auteur}.epub",aw.SaveFormat.EPUB)
             
                    
        
