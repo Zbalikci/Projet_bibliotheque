@@ -2,6 +2,7 @@
 import glob
 import os
 import sys
+import numpy as np
 import PyPDF2 # pour pouvoir l'utiliser : pip install PyPDF2
 from PyPDF2 import PdfReader 
 import ebooklib # pour pouvoir l'utiliser : pip install ebooklib
@@ -148,8 +149,8 @@ class Livres():
 
     def __getitem__(self,i):
         return self.livres[i]
-    
-#"\n".join([str(c) for c in self.livres])
+
+
 
 class Rapport():
     """
@@ -162,8 +163,8 @@ class Rapport():
     # Ma classe n'est pas complète et ça ne marche pas bien , mais voici l'idée que jai :
     def __init__(self, dossier):
         
-        livresPDF=Trier(dossier).DocumentsPDF #liste des livres pdf (avec le chemin des fichiers)
-        livresEpub=Trier(dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
+        livresPDF=Trier(dossier).DocumentsPDF[:50] #liste des livres pdf (avec le chemin des fichiers)
+        livresEpub=Trier(dossier).DocumentsEpub[:50] #liste des livres epub (avec le chemin des fichiers)
         
         self.rapport=Livres(livresEpub).livres #liste des livres : [ [titre, auteur, langage] , ... ]
         for livre in Livres(livresPDF).livres:
@@ -179,6 +180,33 @@ class Rapport():
                 f.write(f"\nLivre {i} : \n Le titre : {self.rapport[i][0]}")
                 f.write("\n L'auteur : "+self.rapport[i][1])
                 f.write("\n Le langage : "+self.rapport[i][2])
+
+        self.rapport2=[]
+        self.auteurs=[]
+        for livre in self.rapport:
+            if livre[1] in self.auteurs:
+                pass
+            else :
+                self.auteurs.append(livre[1])
+                self.rapport2.append([livre[1]])
+
+        for auteur in self.auteurs :
+            for livre in self.rapport :
+                if auteur == livre[1]:
+                    self.rapport2[self.auteurs.index(auteur)].append(livre[0])
+
+        with open("La liste des auteurs.txt","w") as f :
+            f.write(" Auteur 1 : "+self.rapport2[0][0])
+            f.write("\nSes livres :")
+            for k in range (1,len(self.rapport2[0])):
+                f.write(f"\nLivre {k} : {self.rapport2[0][k]}")
+        with open("La liste des auteurs.txt","a+") as f :
+            for i in range(1,len(self.rapport2)):
+                f.write(f"\n\n Auteur {i} : {self.rapport2[i][0]}")
+                f.write("\nSes livres :")
+                for j in range(1,len(self.rapport2[i])):
+                    f.write(f"\nLivre {j} : {self.rapport2[i][j]}")
+
 
     def __str__(self):
         return "\n".join([str(c) for c in self.rapport])
@@ -206,3 +234,4 @@ class MaS(): #Mise à jour des rapports
     dans un fichier de log.
     """
     pass
+
