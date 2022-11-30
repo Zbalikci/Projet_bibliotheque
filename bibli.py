@@ -244,6 +244,6 @@ class Rapport():
         livresPDF_old=self.livresPDF
         livresEpub_old=self.livreEpub
         
-        livresPDF_new=Trier(dossier).DocumentsPDF[:7]
-        livresEpub_new=Trier(dossier).DocumentsEpub[:7]
+        livresPDF_new=Trier(dossier).DocumentsPDF
+        livresEpub_new=Trier(dossier).DocumentsEpub
 
