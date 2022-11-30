@@ -50,8 +50,8 @@ class PDF():
         self.titre=t.replace('"',"-")
         self.nom=path.basename(self.fichier)
         
-        #Pour détecter la langue, on va utiliser le texte de la page 4, car pour certains fichiers pdf on ne pouvait pas détecter le nombre de pages, ou bien le texte,
-        #car certains fichiers pdf ne sont composé que d'images.
+        #Pour détecter la langue, on va utiliser le texte de la page 4, car pour certains fichiers pdf on ne pouvait pas détecter le nombre de pages ou le texte,
+        #parce que certains fichiers pdf ne sont composé que d'images.
         try:
             self.pages= len(livre.pages)
         except :
@@ -95,7 +95,7 @@ class Epub():
         
     def toc(self):
         """ 
-        Cette fonction nous permet d'obtenir la table des matières d'un fichier epub. Il est sous forme de str
+        Cette fonction nous permet d'obtenir la table des matières d'un fichier epub. Il est sous forme de str.
         """
         book = epub.read_epub(self.fichier)
         for item in book.get_items():
@@ -149,12 +149,11 @@ class Rapport():
     """
     def __init__(self, dossier):
         self.dossier=dossier
-        self.livresPDF=Trier(self.dossier).DocumentsPDF #liste des livres pdf (avec le chemin des fichiers)
-        self.livresEpub=Trier(self.dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
-        self.rapport=Livres(self.livresEpub).livres #liste des livres : [ [titre, auteur, langage, nom du fichier] , ... ]
+        self.livresPDF=Trier(self.dossier).DocumentsPDF # liste des chemins des livres pdf
+        self.livresEpub=Trier(self.dossier).DocumentsEpub # liste des chemins des livres epub 
+        self.rapport=Livres(self.livresEpub).livres # liste des livres : [ [titre,auteur,langue,nom du fichier] , [titre,auteur,langue,nom du fichier] , .... ]
         for livre in Livres(self.livresPDF).livres:
             self.rapport.append(livre)
-
 
         #pour obtenir la liste des auteurs et de ses livres :
         self.rapport2=[]
@@ -171,6 +170,8 @@ class Rapport():
                 if auteur == livre[1]:
                     self.rapport2[self.auteurs.index(auteur)].append(livre[0])
                     self.rapport2[self.auteurs.index(auteur)].append(livre[3])
+        # self.rapport2 est de la forme : 
+        # [ [auteur1, livre1, nom du fichier du livre1, livre2, nom du fichier du livre 2, ...] ,  [auteur2, livre1, nom du fichier du livre1, ...]   ,   ... ]
 
     def write(self,chemin_rapports):
         """
@@ -179,6 +180,9 @@ class Rapport():
         """
         ancien_repertoire = os.getcwd()
         os.chdir(chemin_rapports)
+        
+        # Création des fichiers txt:
+        # La liste des ouvrages :
         with open("La liste des ouvrages.txt","w") as f :
             f.write("\nLivre 1 : \n Le titre : "+self.rapport[0][0])
         
@@ -191,7 +195,7 @@ class Rapport():
                 f.write("\n L'auteur : "+self.rapport[i][1])
                 f.write("\n La langue : "+self.rapport[i][2])
                 f.write("\n Le nom du fichier : "+self.rapport[i][3])
-        
+        # La liste des auteurs :
         with open("La liste des auteurs.txt","w") as f :
             f.write("Auteur 1 : "+self.rapport2[0][0])
             f.write("\n Ses livres :")
@@ -225,6 +229,7 @@ class Rapport():
         ancien_repertoire = os.getcwd()
         os.chdir(chemin_rapports)
         for file in self.livresPDF:
+            # Création du fichier txt:
             livre = PDF(file)
             toc= livre.toc()
             with open(f"La table des matières de {livre.nom[:-4]}.txt","w") as f :
@@ -244,6 +249,7 @@ class Rapport():
         for file in self.livresEpub:
             livre = Epub(file)
             toc= livre.toc()
+            # Création du fichier txt:
             with open(f"La table des matières de {livre.nom[:-5]}.txt","w") as f :
                  f.write(toc)
             # conversion de la liste txt en pdf
@@ -256,13 +262,16 @@ class Rapport():
             
     def MaJ(self,chemin_rapports) : #Mise à jour des rapports
         """
-        Cette classe met à jour les rapports précédemment générés, en tenant compte de l’état présent de la bibliothèque : générer les rapports des nouveaux livres, 
-        et supprimer les rapports des livres disparus.
-        ELLE NE PEUT PAS MODIFIER LES RAPPORTS DES LIVRES QUI ONT ETE MODIFIES DEPUIS LA DERNIERE GENERATION 
+        Cette classe met à jour les rapports précédemment générés, en tenant compte de l’état présent de la bibliothèque : générer la nouvelle liste des ouvrages,
+        la nouvelle liste des auteurs, et générer les fichiers contenant la tables des matières des nouvelles livres en plus de supprimer ceux des livres disparus.
+        
+        ELLE NE PEUT PAS MODIFIER LES RAPPORTS DES LIVRES QUI ONT ETE MODIFIES DEPUIS LA DERNIERE GENERATION (nous n'avons pas compris la demande)
         Chaque exécution d’une mise à jour consigne les opérations réalisées (créations, modifications et suppression) dans un fichier de log.
         """     
         ancien_repertoire = os.getcwd()
         os.chdir(chemin_rapports)
+        
+        # On crée la liste des chemins des livres disparus:
         with open("La liste des ouvrages.txt","r") as f:
             lines=f.readlines()
         old_files=[]
@@ -270,16 +279,15 @@ class Rapport():
             nom_fichier=lines[6*i-1]
             n=nom_fichier.replace(" Le nom du fichier : ","")
             old_files.append(self.dossier+"/"+n.replace("\n",""))
-
+            
+        # On crée la liste des chemins de TOUS les livres dans le dossier donné en argument en initialisation
         new_livresPDF=Trier(self.dossier).DocumentsPDF 
         new_livresEpub=Trier(self.dossier).DocumentsEpub
         new_files=new_livresPDF 
         for livre in new_livresEpub:
             new_files.append(livre)
 
-        livresPDF_old=self.livresPDF
-        livresEpub_old=self.livresEpub
-        
+        # On regénére les 6 fichiers (et on écrase les anciens) : la liste des ouvrages et la liste des auteurs 
         livresPDF_new=Trier(self.dossier).DocumentsPDF
         livresEpub_new=Trier(self.dossier).DocumentsEpub
         
@@ -303,10 +311,9 @@ class Rapport():
         
         self.rapport=new_rapport
         self.rapport2=new_rapport2
+        self.write(chemin_rapports) 
         
-        self.write(chemin_rapports) # va regénerer (cela va régenerer les 6 fichiers seulement) les rapports (et écraser les anciens) avec la nouvelle liste des livres
-
-        #pour les Table de matières
+        # Pour la crétion et supression des tables de matières
         files_added=[]
         files_deleted=[]
         
@@ -316,8 +323,7 @@ class Rapport():
         for file in old_files:
             if file not in new_files:
                 files_deleted.append(file)
-                
-        
+
         livresPDF_to_create=[]
         livresEpub_to_create=[]
         for file in files_added:
@@ -338,14 +344,14 @@ class Rapport():
         
         for livre in livresEpub_to_delete:
             l=path.basename(livre[:-5])
-            os.remove(f"Le table des matières de {l}.txt")
-            os.remove(f"Le table des matières de {l}.pdf")
-            os.remove(f"Le table des matières de {l}.epub")
+            os.remove(f"La table des matières de {l}.txt")
+            os.remove(f"La table des matières de {l}.pdf")
+            os.remove(f"La table des matières de {l}.epub")
         for livre in livresPDF_to_delete:
             l=path.basename(livre[:-4])
-            os.remove(f"Le table des matières de {l}.txt")
-            os.remove(f"Le table des matières de {l}.pdf")
-            os.remove(f"Le table des matières de {l}.epub")
+            os.remove(f"La table des matières de {l}.txt")
+            os.remove(f"La table des matières de {l}.pdf")
+            os.remove(f"La table des matières de {l}.epub")
 
         self.livresPDF=livresPDF_to_create
         self.livresEpub=livresEpub_to_create
