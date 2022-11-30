@@ -241,5 +241,9 @@ class Rapport():
         Chaque exécution d’une mise à jour consigne les opérations réalisées (créations, modifications et suppression) 
         dans un fichier de log.
         """
-        pass
+        livresPDF_old=self.livresPDF
+        livresEpub_old=self.livreEpub
+        
+        livresPDF_new=Trier(dossier).DocumentsPDF[:7]
+        livresEpub_new=Trier(dossier).DocumentsEpub[:7]
 
