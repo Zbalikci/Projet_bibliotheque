@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup #pour convertir HTML en STR
 import fitz  # pour pouvoir l'utiliser : pip install PyMuPDF
 from langdetect import detect # pour pouvoir l'utiliser : pip install langdetect
 import aspose.words as aw # pour pouvoir l'utiliser : pip install aspose.words
+import logging
 
 class Trier():
     """
@@ -233,7 +234,7 @@ class Rapport():
             livre = PDF(file)
             toc= livre.toc()
             with open(f"La table des matières de {livre.nom[:-4]}.txt","w") as f :
-                if len(toc)>0:    
+                if len(toc)>1:    
                     f.write("\n"+str(toc[0]))
                     for i in range(1,len (toc)):
                         f.write(f"\n {str(toc[i])}")
@@ -267,6 +268,7 @@ class Rapport():
         
         ELLE NE PEUT PAS MODIFIER LES RAPPORTS DES LIVRES QUI ONT ETE MODIFIES DEPUIS LA DERNIERE GENERATION (nous n'avons pas compris la demande)
         Chaque exécution d’une mise à jour consigne les opérations réalisées (créations, modifications et suppression) dans un fichier de log.
+        Le fichier log est enregistré dans le dossier où se trouvre le fichier python exécuter.
         """     
         ancien_repertoire = os.getcwd()
         os.chdir(chemin_rapports)
@@ -352,8 +354,24 @@ class Rapport():
             os.remove(f"La table des matières de {l}.txt")
             os.remove(f"La table des matières de {l}.pdf")
             os.remove(f"La table des matières de {l}.epub")
-
+            
         self.livresPDF=livresPDF_to_create
         self.livresEpub=livresEpub_to_create
         self.ToC(chemin_rapports)
+        
+        # Création du fichier log :
+        Log_Format = "%(levelname)s %(asctime)s - %(message)s"
+
+        logging.basicConfig(filename = "Modifications.log",
+                            filemode = "w",
+                            format = Log_Format, 
+                            level = logging.INFO)
+        logger = logging.getLogger()
+
+        #Teste du log sur 2 listes à afficher 
+        l1 = "\n".join([str(c) for c in files_added])
+        l2 = "\n".join([str(c) for c in files_deleted])
+        logger.info("Les livres ajoutés sont :\n" + l1)
+        logger.info("Les livres effacés sont :\n" + l2)
+        # logging.shutdown() pour pouvoir effacé le fichier log
         os.chdir(ancien_repertoire)
