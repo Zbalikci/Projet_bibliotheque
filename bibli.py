@@ -275,3 +275,36 @@ class Rapport():
         # self.livresPDF=livresPDF_new
         # self.livresEpub=livresEpub_new
         self.write() # va regénerer les rapports (et écraser les anciens) avec la nouvelle liste des livres
+        
+        #pour les Table de matières
+        livresPDF_to_delete=[]
+        livresEpub_to_delete=[]
+
+        livresPDF_to_create=[]
+        livresEpub_to_create=[]
+
+        for livre in livresPDF_old:
+            if livre not in livresPDF_new:
+                livresPDF_to_delete.append(livre)
+
+        for livre in livresEpub_old:
+            if livre not in livresEpub_new:
+                livresEpub_to_delete.append(livre)
+
+        for livre in livresEpub_to_delete:
+            l=Epub(livre)
+            os.remove(f"Le table des matières de {l.titre}")
+        for livre in livresPDF_to_delete:
+            l=PDF(livre)
+            os.remove(f"Le table des matières de {l.titre}")
+
+        for livre in livresPDF_new:
+            if livre not in livresPDF_old:
+                livresPDF_to_create.append(livre)
+        for livre in livresPDF_new:
+            if livre not in livresPDF_old:
+                livresPDF_to_create.append(livre)
+
+        self.livresPDF=livresPDF_new
+        self.livresEpub=livresEpub_new
+        self.ToC()
