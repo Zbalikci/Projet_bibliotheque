@@ -1,5 +1,5 @@
 #Creating and Configuring Logger
-# création du fichier log.
+# création du fichier log à adapter avec les listes.
 import logging
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 
