@@ -215,6 +215,7 @@ class ToC():
             livre = PDF(file)
             toc= livre.toc()
             with open(f"Le table des matières de {livre.titre}.txt","w") as f :
+                if len(toc)>1:
                f.write("\n"+str(toc[0]))
                for i in range(1,len (toc)):
                    f.write(f"\n {str(toc[i])}")
