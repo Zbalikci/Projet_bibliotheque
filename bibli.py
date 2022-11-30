@@ -140,14 +140,30 @@ class Rapport():
     
     """
     def __init__(self, dossier):
-        
-        self.livresPDF=Trier(dossier).DocumentsPDF[:10] #liste des livres pdf (avec le chemin des fichiers)
-        self.livresEpub=Trier(dossier).DocumentsEpub[:10] #liste des livres epub (avec le chemin des fichiers)
-        
+        self.dossier=dossier
+        self.livresPDF=Trier(self.dossier).DocumentsPDF[:10] #liste des livres pdf (avec le chemin des fichiers)
+        self.livresEpub=Trier(self.dossier).DocumentsEpub[:10] #liste des livres epub (avec le chemin des fichiers)
         self.rapport=Livres(self.livresEpub).livres #liste des livres : [ [titre, auteur, langage] , ... ]
         for livre in Livres(self.livresPDF).livres:
             self.rapport.append(livre)
 
+
+        #pour obtenir la liste des auteurs et de ses livres :
+        self.rapport2=[]
+        self.auteurs=[]
+        for livre in self.rapport:
+            if livre[1] in self.auteurs:
+                pass
+            else :
+                self.auteurs.append(livre[1])
+                self.rapport2.append([livre[1]])
+                
+        for auteur in self.auteurs :
+            for livre in self.rapport :
+                if auteur == livre[1]:
+                    self.rapport2[self.auteurs.index(auteur)].append(livre[0])
+                
+    def write(self):
         with open("La liste des ouvrages.txt","w") as f :
             f.write("Livre 1 : \n Le titre : "+self.rapport[0][0])
         
@@ -158,21 +174,7 @@ class Rapport():
                 f.write(f"\n\nLivre {i+1} : \n Le titre : {self.rapport[i][0]}")
                 f.write("\n L'auteur : "+self.rapport[i][1])
                 f.write("\n Le langage : "+self.rapport[i][2])
-        #pour obtenir la liste des auteurs :
-        self.rapport2=[]
-        self.auteurs=[]
-        for livre in self.rapport:
-            if livre[1] in self.auteurs:
-                pass
-            else :
-                self.auteurs.append(livre[1])
-                self.rapport2.append([livre[1]])
-
-        for auteur in self.auteurs :
-            for livre in self.rapport :
-                if auteur == livre[1]:
-                    self.rapport2[self.auteurs.index(auteur)].append(livre[0])
-
+        
         with open("La liste des auteurs.txt","w") as f :
             f.write("Auteur 1 : "+self.rapport2[0][0])
             f.write("\n Ses livres :")
@@ -231,7 +233,7 @@ class Rapport():
             doc = aw.Document(f"Le table des matières de {livre.titre}.txt")
             doc.save(f"Le table des matières de {livre.titre}.epub",aw.SaveFormat.EPUB)
             
-    def MaJ(self):#Mise à jour des rapports
+    def MaJ(self) : #Mise à jour des rapports
         """
         Cette classe doit mettre à jour (sans tout regénérer) les rapports précédemment générés, 
         en tenant compte de l’état présent de la bibliothèque : générer les rapports des nouveaux livres, 
@@ -242,8 +244,34 @@ class Rapport():
         dans un fichier de log.
         """
         livresPDF_old=self.livresPDF
-        livresEpub_old=self.livreEpub
+        livresEpub_old=self.livresEpub
         
-        livresPDF_new=Trier(dossier).DocumentsPDF
-        livresEpub_new=Trier(dossier).DocumentsEpub
-
+        livresPDF_new=Trier(self.dossier).DocumentsPDF[:7]
+        livresEpub_new=Trier(self.dossier).DocumentsEpub[:7]
+        
+        old_rapport=self.rapport
+        
+        new_rapport=Livres(livresEpub_new).livres #liste des livres : [ [titre, auteur, langage] , ... ]
+        for livre in Livres(livresPDF_new).livres:
+            new_rapport.append(livre)
+        
+        old_rapport2=self.rapport2
+        
+        new_rapport2=[]
+        auteurs=[]
+        for livre in new_rapport:
+            if livre[1] in auteurs:
+                pass
+            else :
+                auteurs.append(livre[1])
+                new_rapport2.append([livre[1]])    
+        for auteur in auteurs :
+            for livre in new_rapport :
+                if auteur == livre[1]:
+                    new_rapport2[auteurs.index(auteur)].append(livre[0])
+        
+        self.rapport=new_rapport
+        self.rapport2=new_rapport2
+        # self.livresPDF=livresPDF_new
+        # self.livresEpub=livresEpub_new
+        self.write() # va regénerer les rapport (et écraser les anciens) avec la nouvelle liste des livres
