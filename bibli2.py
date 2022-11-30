@@ -1,18 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+#!/bin/env python3
 import glob
-import os
-import sys
-import PyPDF2 # pour pouvoir l'utiliser : pip install PyPDF2
-from PyPDF2 import PdfReader 
+import os 
+from os import path
+from PyPDF2 import PdfReader # pour pouvoir l'utiliser : pip install PyPDF2
 import ebooklib # pour pouvoir l'utiliser : pip install ebooklib
 from ebooklib import epub 
 from bs4 import BeautifulSoup #pour convertir HTML en STR
-from pikepdf import Pdf
 import fitz  # pour pouvoir l'utiliser : pip install PyMuPDF
-import langdetect # pour pouvoir l'utiliser : pip install langdetect
-from langdetect import detect 
+from langdetect import detect # pour pouvoir l'utiliser : pip install langdetect
 import aspose.words as aw
+
 class Trier():
     """
     Cette classe trie les fichiers dans un dossier donne en argument. Il crée 1 liste dans laquelle se trouve tous les fichiers pdf
@@ -49,7 +46,8 @@ class PDF():
         livre = PdfReader(self.fichier)
         donnees = livre.getDocumentInfo()
         self.auteur = donnees.author if donnees.author else u'Inconnu'
-        self.titre = donnees.title if donnees.title else self.fichier
+        self.titre = donnees.title if donnees.title else path.basename(self.fichier)
+        self.nom=path.basename(self.fichier)
         try:
             self.pages= len(livre.pages)
         except :
@@ -71,16 +69,6 @@ class PDF():
     def __repr__(self):
         return f"{self.titre} de {self.auteur}"
     
-    # l'ancienne :
-    # def toc(self):
-    #     if self.pages>=2:
-    #         with open(self.fichier,'rb') as f:
-    #             pdf = PdfReader(f)
-    #             page = pdf.getPage(1)
-    #             text = page.extractText()
-    #             return text
-    # le nouveau :
-    
     def toc(self):
         livre = fitz.open(self.fichier)
         return livre.get_toc()
@@ -95,7 +83,7 @@ class Epub():
         self.auteur=livre.get_metadata('DC', 'creator')[0][0]
         self.titre=livre.get_metadata('DC', 'title')[0][0]
         self.langage=livre.get_metadata('DC', 'language')[0][0]
-        
+        self.nom=path.basename(self.fichier)
         #ou bien :
         # self.titre=livre.metadata['title']
         # self.langage=livre.metadata['author']
@@ -110,7 +98,7 @@ class Epub():
                 soup = BeautifulSoup(item.get_content(), features="xml")
         toc = soup.get_text()
         return toc.replace('\n\n\n\n',"")
-    #ou bien :
+    #ou bien : mais dans ce cas il faudra changer la class ToC
     # def toc(self):
         # livre = fitz.open(self.fichier)
         # return .get_toc()
@@ -124,7 +112,7 @@ class Epub():
 class Livres():
     """
     Cette classe crée une liste contenant le titre, l'auteur et le langage de chaque livre :
-    [ [titre,auteur,langage], [titre,auteur,langage] , ....].
+    [ [titre,auteur,langage,nom du fichier], [titre,auteur,langage,nom du fichier] , ....].
     """
     def __init__(self,liste_fichiers):
         self.livres=[]
@@ -133,112 +121,147 @@ class Livres():
             nature=(os.path.splitext(fichier)[1])
             if nature =='.pdf':
                 livre=PDF(fichier)
-                self.livres.append([livre.titre,livre.auteur,livre.langage])
+                self.livres.append([livre.titre,livre.auteur,livre.langage,livre.nom])
             if nature =='.epub':
                 livre=Epub(fichier)
-                self.livres.append([livre.titre,livre.auteur,livre.langage])
+                self.livres.append([livre.titre,livre.auteur,livre.langage,livre.nom])
                 
     def __str__(self):
         return "\n".join([str(c) for c in self.livres])
     
     def __repr__(self):
         return "\n".join([str(c) for c in self.livres])
-    
-    def __iter__(self):
-        return iter(self.livres)
 
-    def __getitem__(self,i):
-        return self.livres[i]
-    
-#"\n".join([str(c) for c in self.livres])
 
 class Rapport():
     """
     Cette classe crée 3 documents (pdf,epub,txt) contenant le nom de chaque auteur des livres et crée 3 autres
     documents (pdf,epub,txt) contenant le titre de chaque livre.
-    3 documents contenant : [ [auteur, (livre1,livre2,...)] , [auteur, (livre1,livre2,...)] , ... ]
-    3 autres documents contenant : [ [titre,auteur,langage], [titre,auteur,langage] , ....].
+    3 documents contenant : [ [auteur, (livre1,nom du fichier,livre2,nom du fichier...)] , [auteur, (livre1,nom du fichier,livre2,nom du fichier...)] , ... ]
+    3 autres documents contenant : [ [titre,auteur,langage,nom du fichier], [titre,auteur,langage,nom du fichier] , ....].
     
     """
-    # Ma classe n'est pas complète et ça ne marche pas bien , mais voici l'idée que jai :
     def __init__(self, dossier):
-        
-        livresPDF=Trier(dossier).DocumentsPDF #liste des livres pdf (avec le chemin des fichiers)
-        livresEpub=Trier(dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
-        
-        self.rapport=Livres(livresEpub).livres #liste des livres : [ [titre, auteur, langage] , ... ]
-        for livre in Livres(livresPDF).livres:
+        self.dossier=dossier
+        self.livresPDF=Trier(self.dossier).DocumentsPDF #liste des livres pdf (avec le chemin des fichiers)
+        self.livresEpub=Trier(self.dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
+        self.rapport=Livres(self.livresEpub).livres #liste des livres : [ [titre, auteur, langage, nom du fichier] , ... ]
+        for livre in Livres(self.livresPDF).livres:
             self.rapport.append(livre)
 
+
+        #pour obtenir la liste des auteurs et de ses livres :
+        self.rapport2=[]
+        self.auteurs=[]
+        for livre in self.rapport:
+            if livre[1] in self.auteurs:
+                pass
+            else :
+                self.auteurs.append(livre[1])
+                self.rapport2.append([livre[1]])
+                
+        for auteur in self.auteurs :
+            for livre in self.rapport :
+                if auteur == livre[1]:
+                    self.rapport2[self.auteurs.index(auteur)].append(livre[0])
+                    self.rapport2[self.auteurs.index(auteur)].append(livre[3])
+
+    def write(self):
         with open("La liste des ouvrages.txt","w") as f :
-            f.write("Livre 1 : \n Le titre : "+self.rapport[0][0])
+            f.write("\nLivre 1 : \n Le titre : "+self.rapport[0][0])
         
         with open("La liste des ouvrages.txt","a+") as f :
             f.write("\n L'auteur : "+self.rapport[0][1])
             f.write("\n Le langage : "+self.rapport[0][2])
+            f.write("\n Le nom du fichier : "+self.rapport[0][3])
             for i in range(1,len (self.rapport)):
-                f.write(f"\nLivre {i} : \n Le titre : {self.rapport[i][0]}")
+                f.write(f"\n\nLivre {i+1} : \n Le titre : {self.rapport[i][0]}")
                 f.write("\n L'auteur : "+self.rapport[i][1])
                 f.write("\n Le langage : "+self.rapport[i][2])
-                
-        # conversion de la liste txt en pdf:    
+                f.write("\n Le nom du fichier : "+self.rapport[i][3])
+        
+        with open("La liste des auteurs.txt","w") as f :
+            f.write("Auteur 1 : "+self.rapport2[0][0])
+            f.write("\n Ses livres :")
+            for k in range (1,int((len(self.rapport2[0]))/2)+1):
+                f.write(f"\n Livre {k} : {self.rapport2[0][2*k-1]} et le nom du ficier : {self.rapport2[0][2*k]} ")
+        with open("La liste des auteurs.txt","a+") as f :
+            for i in range(1,len(self.rapport2)):
+                f.write(f"\n\nAuteur {i+1} : {self.rapport2[i][0]}")
+                f.write("\n Ses livres :")
+                for j in range (1,int((len(self.rapport2[i]))/2)+1): 
+                    f.write(f"\n Livre {j} : {self.rapport2[i][2*j-1]} et le nom du ficier : {self.rapport2[i][2*j]} ")
+                    
+        # conversion de la liste txt en pdf
         doc = aw.Document("La liste des ouvrages.txt")
         doc.save("La liste des ouvrages.pdf",aw.SaveFormat.PDF)
+        doc = aw.Document("La liste des auteurs.txt")
+        doc.save("La liste des auteurs.pdf",aw.SaveFormat.PDF)
         
         # conversion de la liste txt en epub
         doc = aw.Document("La liste des ouvrages.txt")
         doc.save("La liste des ouvrages.epub",aw.SaveFormat.EPUB)
-       
-    def __str__(self):
-        return "\n".join([str(c) for c in self.rapport])
-    
-    def __repr__(self):
-        return "\n".join([str(c) for c in self.rapport]) 
-
-    def __iter__(self):
-        return iter(self.rapport) 
-
-class ToC():
-    """
-    Cette classe crée 3 documents (pdf,epub,txt) contenant le table des matières des livres dans le dossier donne en argument.
-    """
-    def __init__(self,dossier):
-        livresPDF=Trier(dossier).DocumentsPDF #liste des livres pdf (avec le chemin des fichiers)
-        # livresEpub=Trier(dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
+        doc = aw.Document("La liste des auteurs.txt")
+        doc.save("La liste des auteurs.epub",aw.SaveFormat.EPUB)
         
-        for file in livresPDF:
+        
+    def ToC(self):
+        """
+        Cette fonction crée 3 documents (pdf,epub,txt) contenant le table des matières de chacun des livres dans le dossier donne en argument.
+        """
+        for file in self.livresPDF:
             livre = PDF(file)
-            self.toc= livre.toc()
-            with open(f"Le table de matière de {livre.titre} de l'auteur : {livre.auteur}.txt","w") as f :
-               f.write("\n"+str(self.toc[0]))
-               for i in range(1,len (self.toc)):
-                   f.write(f"\n {str(self.toc[i])}")
+            toc= livre.toc()
+            with open(f"Le table des matières de {livre.titre}.txt","w") as f :
+                if len(toc)>0:    
+                    f.write("\n"+str(toc[0]))
+                    for i in range(1,len (toc)):
+                        f.write(f"\n {str(toc[i])}")
+                else :
+                    f.write("Ce livre ne possède pas de table de matière")
             # conversion de la liste txt en pdf:           
-            doc = aw.Document(f"Le table de matière de {livre.titre} de l'auteur : {livre.auteur}.txt")
-            doc.save(f"Le table de matière de {livre.titre} de l'auteur : {livre.auteur}.pdf",aw.SaveFormat.PDF)
+            doc = aw.Document(f"Le table des matières de {livre.titre}.txt")
+            doc.save(f"Le table des matières de {livre.titre}.pdf",aw.SaveFormat.PDF)
             # conversion de la liste txt en epub
-            doc = aw.Document(f"Le table de matière de {livre.titre} de l'auteur : {livre.auteur}.txt")
-            doc.save(f"Le table de matière de {livre.titre} de l'auteur : {livre.auteur}.epub",aw.SaveFormat.EPUB)
+            doc = aw.Document(f"Le table des matières de {livre.titre}.txt")
+            doc.save(f"Le table des matières de {livre.titre}.epub",aw.SaveFormat.EPUB)
             
-                   
-       
-    def __str__(self):
-          return "\n".join([str(c) for c in self.toc])
-
-    def __repr__(self):
-          return "\n".join([str(c) for c in self.toc])
-    def __iter__(self):
-        return iter(self.toc) 
-
-
-class MaS(): #Mise à jour des rapports
-    """
-    Cette classe doit mettre à jour (sans tout regénérer) les rapports précédemment générés, 
-    en tenant compte de l’état présent de la bibliothèque : générer les rapports des nouveaux livres, 
-    modifier ceux correspondants à des livres qui ont été modifiés depuis la dernière génération, 
-    et enfin supprimer les rapports des livres disparus.
+        for file in self.livresEpub:
+            livre = Epub(file)
+            toc= livre.toc()
+            with open(f"Le table des matières de {livre.titre}.txt","w") as f :
+                 f.write(toc)
+            # conversion de la liste txt en pdf
+            doc = aw.Document(f"Le table des matières de {livre.titre}.txt")
+            doc.save(f"Le table des matières de {livre.titre}.pdf",aw.SaveFormat.PDF)
+            # conversion de la liste txt en epub
+            doc = aw.Document(f"Le table des matières de {livre.titre}.txt")
+            doc.save(f"Le table des matières de {livre.titre}.epub",aw.SaveFormat.EPUB)
+            
+    def MaJ(self,chemin_rapports) : #Mise à jour des rapports
+        """
+        Cette classe doit mettre à jour (sans tout regénérer) les rapports précédemment générés, 
+        en tenant compte de l’état présent de la bibliothèque : générer les rapports des nouveaux livres, 
+        modifier ceux correspondants à des livres qui ont été modifiés depuis la dernière génération, 
+        et enfin supprimer les rapports des livres disparus.
     
-    Chaque exécution d’une mise à jour consigne les opérations réalisées (créations, modifications et suppression) 
-    dans un fichier de log.
-    """
-    pass
+        Chaque exécution d’une mise à jour consigne les opérations réalisées (créations, modifications et suppression) 
+        dans un fichier de log.
+        """        
+        ancien_repertoire = os.getcwd()
+        os.chdir(chemin_rapports)
+        with open("La liste des ouvrages.txt","r") as f:
+            lines=f.readlines()
+        old_files=[]
+        for i in range(1,int((len(lines))/6)):
+            nom_fichier=lines[6*i-1]
+            n=nom_fichier.replace(" Le nom du fichier : ","")
+            old_files.append(self.dossier+n.replace("\n",""))
+        os.chdir(ancien_repertoire)
+
+        new_livresPDF=Trier(self.dossier).DocumentsPDF #liste des livres pdf (avec le chemin des fichiers)
+        new_livresEpub=Trier(self.dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
+        new_files=new_livresPDF #liste des livres : [ [titre, auteur, langage, nom du fichier] , ... ]
+        for livre in new_livresEpub:
+            new_files.append(livre)
+        return len(old_files),len(new_files)
