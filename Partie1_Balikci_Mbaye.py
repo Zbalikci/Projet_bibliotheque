@@ -368,7 +368,6 @@ class Rapport():
                             level = logging.INFO)
         logger = logging.getLogger()
 
-        #Teste du log sur 2 listes à afficher 
         l1 = "\n".join([str(c) for c in files_added])
         l2 = "\n".join([str(c) for c in files_deleted])
         logger.info("Les livres ajoutés sont :\n" + l1)
