@@ -141,8 +141,8 @@ class Rapport():
     """
     def __init__(self, dossier):
         self.dossier=dossier
-        self.livresPDF=Trier(self.dossier).DocumentsPDF[:10] #liste des livres pdf (avec le chemin des fichiers)
-        self.livresEpub=Trier(self.dossier).DocumentsEpub[:10] #liste des livres epub (avec le chemin des fichiers)
+        self.livresPDF=Trier(self.dossier).DocumentsPDF #liste des livres pdf (avec le chemin des fichiers)
+        self.livresEpub=Trier(self.dossier).DocumentsEpub #liste des livres epub (avec le chemin des fichiers)
         self.rapport=Livres(self.livresEpub).livres #liste des livres : [ [titre, auteur, langage] , ... ]
         for livre in Livres(self.livresPDF).livres:
             self.rapport.append(livre)
@@ -246,8 +246,8 @@ class Rapport():
         livresPDF_old=self.livresPDF
         livresEpub_old=self.livresEpub
         
-        livresPDF_new=Trier(self.dossier).DocumentsPDF[:7]
-        livresEpub_new=Trier(self.dossier).DocumentsEpub[:7]
+        livresPDF_new=Trier(self.dossier).DocumentsPDF
+        livresEpub_new=Trier(self.dossier).DocumentsEpub
         
         old_rapport=self.rapport
         
@@ -274,4 +274,4 @@ class Rapport():
         self.rapport2=new_rapport2
         # self.livresPDF=livresPDF_new
         # self.livresEpub=livresEpub_new
-        self.write() # va regénerer les rapport (et écraser les anciens) avec la nouvelle liste des livres
+        self.write() # va regénerer les rapports (et écraser les anciens) avec la nouvelle liste des livres
